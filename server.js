@@ -2,8 +2,19 @@ const net = require('net');
 
 const clientMap = new Map();
 
+
+// Fonction pour obtenir l'adresse IPv4 à partir de l'adresse IPv6
+function getIPv4(ip) {
+    if (ip.includes(':')) {
+        // Si l'adresse contient des deux points, c'est une adresse IPv6
+        const parts = ip.split(':');
+        return parts[parts.length - 1]; // Renvoie la dernière partie (qui est l'adresse IPv4)
+    }
+    return ip; // Si c'est déjà une adresse IPv4, la renvoie telle quelle
+}
+
 const server = net.createServer((socket) => {
-    console.log('Client TCP/IP connected:', `${socket.remoteAddress}:${socket.remotePort}`);
+    console.log('Client TCP/IP connected:', `${getIPv4(socket.remoteAddress)}:${socket.remotePort}`);
 
 
     socket.on('data', (data) => {
@@ -22,7 +33,7 @@ const server = net.createServer((socket) => {
     });
 
     socket.on('end', () => {
-        console.log('Client TCP/IP disconnected:', `${socket.remoteAddress}:${socket.remotePort}`);
+        console.log('Client TCP/IP disconnected:', `${getIPv4(socket.remoteAddress)}:${socket.remotePort}`);
         // Supprimer l'entrée associée dans le clientMap lors de la déconnexion du client
         clientMap.forEach((value, key) => {
             if (value === socket.remoteAddress) {
@@ -53,5 +64,5 @@ function firstConnection(socket, list) {
 
 
 server.listen(5000, () => {
-    console.log('Server TCP/IP listening on port 4400');
+    console.log('Server TCP/IP listening on port 5000');
 });
