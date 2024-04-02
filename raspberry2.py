@@ -4,7 +4,7 @@ import time
 import random
 
 # Définir les informations du serveur TCP/IP
-server_address = ('localhost', 8080)
+server_address = ('localhost', 5000)
 
 # Créer un socket TCP/IP
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
