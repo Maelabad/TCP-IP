@@ -52,6 +52,6 @@ function firstConnection(socket, list) {
 
 
 
-server.listen(4400, () => {
+server.listen(5000, () => {
     console.log('Server TCP/IP listening on port 4400');
 });
