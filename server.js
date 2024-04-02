@@ -52,6 +52,6 @@ function firstConnection(socket, list) {
 
 
 
-server.listen(8080, () => {
-    console.log('Server TCP/IP listening on port 8080');
+server.listen(4400, () => {
+    console.log('Server TCP/IP listening on port 4400');
 });
