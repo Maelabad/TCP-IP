@@ -7,18 +7,8 @@ const clientMap = new Map();
 const clientSocket = new Map();
 
 
-// Fonction pour obtenir l'adresse IPv4 à partir de l'adresse IPv6
-function getIPv4(ip) {
-    if (ip.includes(':')) {
-        // Si l'adresse contient des deux points, c'est une adresse IPv6
-        const parts = ip.split(':');
-        return parts[parts.length - 1]; // Renvoie la dernière partie (qui est l'adresse IPv4)
-    }
-    return ip; // Si c'est déjà une adresse IPv4, la renvoie telle quelle
-}
-
 const server = net.createServer((socket) => {
-    console.log('Client TCP/IP connected:', `${getIPv4(socket.remoteAddress)}:${socket.remotePort}`);
+    console.log('Client TCP/IP connected:', `${socket.remoteAddress}:${socket.remotePort}`);
 
     
 
@@ -30,7 +20,7 @@ const server = net.createServer((socket) => {
 
         if (parts[0] == "0") { // c'est un raspberry qui s'est connectée raspberry
             raspberrySocket.set(parts[1], socket);
-            raspberryConnected(socket, parts);
+            raspberryConnected(socket, parts, message);
         }
         else {
             clientSocket.set(parts[1], socket);
@@ -40,11 +30,12 @@ const server = net.createServer((socket) => {
     });
 
     socket.on('end', () => {
-        console.log('Client TCP/IP disconnected:', `${getIPv4(socket.remoteAddress)}:${socket.remotePort}`);
+        console.log('Client TCP/IP disconnected:', `${socket.remoteAddress}:${socket.remotePort}`);
         // Supprimer l'entrée associée dans le raspberryMap lors de la déconnexion du client
         raspberryMap.forEach((value, key) => {
             if (value === socket.remoteAddress) {
                 raspberryMap.delete(key);
+                
             }
         });
     });
@@ -54,13 +45,16 @@ const server = net.createServer((socket) => {
     });
 });
 
-function raspberryConnected(socket, list) {
+function raspberryConnected(socket, list, message) {
 
     if (list.length == 3) {
         firstConnection( socket, list, raspberryMap);
         console.log(raspberryMap);
     } else {
         console.log('On a recu des données.');
+
+        send_data_to_client(list, message);
+
         // Ajouter une fonction pour gerer les messages ordinaires
     } 
 }
@@ -101,6 +95,17 @@ function check_and_send_data(list) {
         if (key === imei) {
 
             value.write("Le client a envoyer un message au raspberry");
+        }
+    });    
+}
+
+
+function send_data_to_client(list, message) {
+    imei = list[1]
+    clientSocket.forEach((value, key) => {
+        if (key === imei) {
+
+            value.write(message);
         }
     });    
 }
