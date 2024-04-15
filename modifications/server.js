@@ -14,7 +14,7 @@ const server = net.createServer((socket) => {
 
     socket.on('data', (data) => {
         const message = data.toString(); // Convertir les données en chaîne
-        const parts = message.split(';'); // Supposons que les données sont séparées par des ';'
+        const parts = message.split(' - '); // Supposons que les données sont séparées par des ' - '
 
         console.log(parts);
 
@@ -24,7 +24,7 @@ const server = net.createServer((socket) => {
         }
         else {
             clientSocket.set(parts[1], socket);
-            clientConnected(socket, parts);
+            clientConnected(socket, parts, message);
         }
 
     });
@@ -47,7 +47,7 @@ const server = net.createServer((socket) => {
 
 function raspberryConnected(socket, list, message) {
 
-    if (list.length == 3) {
+    if (list.length == 2) {
         firstConnection( socket, list, raspberryMap);
         console.log(raspberryMap);
     } else {
@@ -60,14 +60,14 @@ function raspberryConnected(socket, list, message) {
 }
 
 
-function clientConnected(socket, list) {
+function clientConnected(socket, list, message) {
 
-    if (list.length == 3) {
+    if (list.length == 2) {
         imei = firstConnection( socket, list, clientMap);
         console.log(clientMap);
     } else {
         console.log('On a recu des données.');
-        check_and_send_data(list);
+        check_and_send_data(list, message);
         
         // Ajouter une fonction pour gerer les messages ordinaires
     } 
@@ -93,8 +93,8 @@ function check_and_send_data(list) {
 
     raspberrySocket.forEach((value, key) => {
         if (key === imei) {
-
-            value.write("Le client a envoyer un message au raspberry");
+            console.log("On envoie des données au DM");
+            value.write(message);
         }
     });    
 }
