@@ -87,7 +87,7 @@ function firstConnection(socket, list, map) {
 
 
 
-function check_and_send_data(list) {
+function check_and_send_data(list, message) {
     imei = list[1];
 
 
