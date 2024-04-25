@@ -20,7 +20,7 @@ try:
 
 
     ip_client = client_socket.getsockname()[0]
-    data = f"1 - {imeis[0]}"
+    data = f"1 - {imeis[1]}"
     client_socket.sendall(data.encode())
     print(f'Sent IMEI {imeis} to server')
 
