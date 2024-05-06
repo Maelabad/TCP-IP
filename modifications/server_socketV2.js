@@ -1,8 +1,8 @@
 const net = require('net');
 
-const raspberrySocket = new Map();
+const RASPBERRY_SOCKET = new Map();
 
-const clientSocket = new Map();
+const CLIENT_SOCKET = new Map();
 
 
 
@@ -19,12 +19,12 @@ const server = net.createServer((socket) => {
         console.log(parts);
 
         if (parts[0] == "0") { // c'est un raspberry qui s'est connectée raspberry
-            raspberrySocket.set(parts[1], socket);
-            console.log(raspberrySocket);
+            RASPBERRY_SOCKET.set(parts[1], socket);
+            console.log(RASPBERRY_SOCKET);
             raspberryConnected(socket, parts, message);
         }
         else if (parts[0] == "1") {
-            clientSocket.set(parts[1], socket);
+            CLIENT_SOCKET.set(parts[1], socket);
             clientConnected(socket, parts, message);
         }
         else {
@@ -35,38 +35,50 @@ const server = net.createServer((socket) => {
 
     socket.on('end', () => {
         console.log('Client TCP/IP disconnected:', `${socket.remoteAddress}:${socket.remotePort}`);
-
+        removeDisconnectedSockets(socket);
 
     });
 
     socket.on('error', (err) => {
         console.error('Client TCP/IP connection error:', err);
-        removeDisconnectedSockets(raspberrySocket, clientSocket);
     });
 });
 
 
-function removeDisconnectedSockets(map1, map2, disconnectedSocket) {
-    console.log(raspberrySocket);
-    console.log(clientSocket);
+function removeDisconnectedClients(imei) {
     // Parcours de la première map
-    for (const [key, socket] of map1.entries()) {
+    for (const [key, socket] of CLIENT_SOCKET.entries()) {
+        // Si le socket correspond au socket déconnecté
+        if (key === imei) {
+            // Supprimer l'entrée correspondante de la première map
+            CLIENT_SOCKET.delete(key);
+            console.log(`IMEI du client déconnecté trouvé dans le CLIENT_SOCKET. Clé: ${key}`);
+            break; // Sortir de la boucle dès que le socket déconnecté est trouvé
+        }
+    }
+
+
+}
+
+function removeDisconnectedSockets(disconnectedSocket) {
+    // Parcours de la première map
+    for (const [key, socket] of RASPBERRY_SOCKET.entries()) {
         // Si le socket correspond au socket déconnecté
         if (socket === disconnectedSocket) {
             // Supprimer l'entrée correspondante de la première map
-            map1.delete(key);
-            console.log(`Socket déconnecté trouvé dans map1. Clé: ${key}`);
+            RASPBERRY_SOCKET.delete(key);
+            console.log(`Socket déconnecté trouvé dans rapberrySocket. Clé: ${key}`);
             break; // Sortir de la boucle dès que le socket déconnecté est trouvé
         }
     }
 
     // Parcours de la deuxième map
-    for (const [key, socket] of map2.entries()) {
+    for (const [key, socket] of CLIENT_SOCKET.entries()) {
         // Si le socket correspond au socket déconnecté
         if (socket === disconnectedSocket) {
             // Supprimer l'entrée correspondante de la deuxième map
-            map2.delete(key);
-            console.log(`Socket déconnecté trouvé dans map2. Clé: ${key}`);
+            CLIENT_SOCKET.delete(key);
+            console.log(`Socket déconnecté trouvé dans CLIENT_SOCKET. Clé: ${key}`);
             // Vous pouvez choisir de sortir de la boucle ici ou continuer à parcourir
             // break; 
         }
@@ -105,7 +117,7 @@ function send_data_to_raspberry(list, message) {
     imei = list[1];
 
     //Parcourons le map pour verifier si l'imei est associé a un socket
-    raspberrySocket.forEach((value, key) => {
+    RASPBERRY_SOCKET.forEach((value, key) => {
         if (key === imei) {
             console.log(`On envoie des données du client ${imei} au DM`);
             value.write(getMessage(message));
@@ -116,7 +128,7 @@ function send_data_to_raspberry(list, message) {
 function send_data_to_client(list, message) {
     imei = list[1]
     //Parcourons le map pour verifier si l'imei est associé a un socket
-    clientSocket.forEach((value, key) => { 
+    CLIENT_SOCKET.forEach((value, key) => { 
         if (key === imei) {
             console.log(`On envoie des données du DM ${imei} au client`);
             value.write(message);
