@@ -21,7 +21,7 @@ try:
     ip_address = "192.168.1.45"  # Récupérer l'adresse IP du client
     
     
-    data = f"{0};{imei};{ip_address}"
+    data = f"{0} - {imei}"
 
 
     client_socket.sendall(data.encode())
@@ -41,7 +41,7 @@ try:
         sdm_id = "SDM123"  # Remplacez ceci par l'ID réel du SDM
         perimeter = "PerimeterA"  # Remplacez ceci par le périmètre réel
         soil_hum = random.uniform(20.0, 40.0)  # Générer une valeur aléatoire pour l'humidité du sol
-        message = f"{0};{imei};{ip_address};{sdm_id};{perimeter};{soil_hum}"
+        message = f"{0} - {imei} - {ip_address} - {sdm_id} - {perimeter} - {soil_hum}"
 
         # Convertir le dictionnaire en JSON et l'envoyer au serveur
         #json_data = json.dumps(message)
