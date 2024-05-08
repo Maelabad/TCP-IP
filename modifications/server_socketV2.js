@@ -113,7 +113,6 @@ function send_data_to_raspberry(socket, list, message) {
     }    
 }
 
-
 function send_data_to_client(list, message) {
     imei = list[1]
     //Parcourons le map pour verifier si l'imei est associé a un socket
