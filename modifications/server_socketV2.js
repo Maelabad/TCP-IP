@@ -17,7 +17,6 @@ const server = net.createServer((socket) => {
 
         if (parts[0] == "0") { // c'est un raspberry qui s'est connectée raspberry
             RASPBERRY_SOCKET.set(parts[1], socket);
-            console.log(RASPBERRY_SOCKET);
             raspberryConnected(socket, parts, message);
         }
         else if (parts[0] == "1") {
@@ -87,7 +86,8 @@ function raspberryConnected(socket, list, message) {
 function clientConnected(socket, list, message) {
 
     if (list.length == 2) {
-        socket.write('OK'); // Ack for the first connexion
+        response = `{"imei": ${list[1]}, "status": "OK"}`;
+        socket.write(response); // Ack for the first connexion
     } else {
         console.log('On a recu des données du client');
         send_data_to_raspberry(socket, list, message);
@@ -104,22 +104,25 @@ function send_data_to_raspberry(socket, list, message) {
         if (key === imei) {
             console.log(`On envoie des données du client ${imei} au DM`);
             value.write(getMessage(message));
-            ckeck = 1;
-            socket.write(`OK - ${imei}`); //Accusé de reception au client pour dire qu'on a bien envoyer les données au client
+            check = 1;
+            response = `{"imei": ${imei}, "status": "OK"}`;
+            socket.write(response); //Accusé de reception au client pour dire qu'on a bien envoyer les données au client
         }
     });
     if (check == 0) { //On a donc pas trouver le socket
-        socket.write(`NOK - ${imei}`); //On dit au client NOK (on a pas trouver le client)
+        response = `{"imei": ${imei}, "status": "NOK"}`;
+        socket.write(response); //On dit au client NOK (on a pas trouver le client)
     }    
 }
 
 function send_data_to_client(list, message) {
-    imei = list[1]
+    imei = list[1];
+    new_message = `{"imei": ${imei}, "data": ${message}}`;
     //Parcourons le map pour verifier si l'imei est associé a un socket
     CLIENT_SOCKET.forEach((value, key) => { 
         if (key === imei) {
             console.log(`On envoie des données du DM ${imei} au client`);
-            value.write(message);
+            value.write(new_message);
         }
     });    
 }
