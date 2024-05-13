@@ -35,7 +35,7 @@ exports = async function(){
 
   try {
     // Find documents where start_time is reached and automatic is true
-    const startDocuments = await collection.find({ debut: { $lte: new Date() }, automatic: true }).toArray();
+    const startDocuments = await collection.find({ debut: { $lte: new Date() }, type: "automatic" }).toArray();
     
     
     
@@ -53,7 +53,7 @@ exports = async function(){
     }
     
     // Find documents where end_time is reached and automatic is true
-    const endDocuments = await collection.find({ fin: { $lte: new Date() }, automatic: true }).toArray();
+    const endDocuments = await collection.find({ fin: { $lte: new Date() }, type: "automatic" }).toArray();
     console.log(endDocuments);
     
       
