@@ -105,20 +105,21 @@ function send_data_to_raspberry(socket, list, message) {
             console.log(`On envoie des données du client ${imei} au DM`);
             value.write(getMessage(message));
             check = 1;
-            response = `{"imei": ${imei}, "status": "OK"}`;
+            response = `{"imei": "${imei}", "status": "OK"}`;
             socket.write(response); //Accusé de reception au client pour dire qu'on a bien envoyer les données au client
         }
     });
     if (check == 0) { //On a donc pas trouver le socket
-        response = `{"imei": ${imei}, "status": "NOK"}`;
+        response = `{"imei": "${imei}", "status": "NOK"}`;
         socket.write(response); //On dit au client NOK (on a pas trouver le client)
     }    
 }
 
+
 function send_data_to_client(list, message) {
     imei = list[1];
-    new_message = `{"imei": ${imei}, "data": ${message}}`;
-    //Parcourons le map pour verifier si l'imei est associé a un socket
+    new_message = `{"imei": "${imei}", "data": "${message}"}`;
+        //Parcourons le map pour verifier si l'imei est associé a un socket
     CLIENT_SOCKET.forEach((value, key) => { 
         if (key === imei) {
             console.log(`On envoie des données du DM ${imei} au client`);
@@ -130,3 +131,4 @@ function send_data_to_client(list, message) {
 server.listen(5000, () => {
     console.log('Server TCP/IP listening on port 5000');
 });
+
